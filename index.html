@@ -1,448 +1,548 @@
 
-
 <!DOCTYPE html>
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#10254a">
-<title>KIDZ SMART RACE</title>
+<meta name="theme-color" content="#10234a">
+<title>KIDZ SMART RACE 2.0</title>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden}
-body{
-font-family:system-ui,Arial,sans-serif;
-background:#10254a;color:white;
-user-select:none;touch-action:manipulation
-}
+body{font-family:Arial,sans-serif;background:#10234a;color:white}
 button,select,input{font:inherit}
-button{cursor:pointer;border:0}
-#app{
-width:100vw;height:100vh;height:100dvh;
-display:flex;flex-direction:column;overflow:hidden;
-background:linear-gradient(#122b53,#10172e);
-padding:env(safe-area-inset-top) env(safe-area-inset-right)
-env(safe-area-inset-bottom) env(safe-area-inset-left)
+button{cursor:pointer}
+#app{height:100vh;height:100dvh;width:100vw;display:flex;flex-direction:column;overflow:hidden}
+#race{
+height:38%;flex:none;position:relative;overflow:hidden;
+background:linear-gradient(#42b9f5 0%,#a8e8ff 42%,#58c66c 43%,#287d48 100%);
+border-bottom:4px solid #ffdc54
 }
-#top{
-height:39%;min-height:0;flex:none;position:relative;
-overflow:hidden;border-bottom:4px solid #f9d35b;
-background:linear-gradient(#38b9f4 0%,#b3edff 48%,#6bd47a 49%,#23764a 100%);
-}
-#sky{
-position:absolute;inset:0;
-background:
-radial-gradient(ellipse at 20% 20%,#fff 0 3%,transparent 3.5%),
-radial-gradient(ellipse at 25% 18%,#fff 0 5%,transparent 5.5%),
-radial-gradient(ellipse at 80% 15%,#fff 0 5%,transparent 5.5%);
-opacity:.8
-}
-#sun{
-position:absolute;right:8%;top:8%;width:48px;height:48px;
-border-radius:50%;background:#ffe78a;box-shadow:0 0 35px #fff3a0
-}
-#stadium{
-position:absolute;top:25%;width:100%;height:18%;
-background:repeating-linear-gradient(90deg,#ed4770 0 17px,#ffcf42 17px 34px);
-border-block:5px solid #f8e6a4;
-}
-#track{
-position:absolute;left:0;right:0;bottom:0;height:59%;
-background:repeating-linear-gradient(to bottom,#df3442 0 30%,#f7f7f7 30% 33%,#df3442 33% 63%,#fff 63% 66%,#df3442 66% 100%);
-border-top:5px solid white;border-bottom:5px solid white;
-}
-#finish{
-position:absolute;right:5%;top:0;height:100%;width:26px;
-background:repeating-conic-gradient(#fff 0 25%,#151515 0 50%) 0/20px 20px;
-}
-#raceCanvas{position:absolute;inset:0;width:100%;height:100%}
-#raceTop{
-position:absolute;top:8px;left:10px;right:10px;
-display:flex;justify-content:space-between;align-items:center;z-index:3
-}
-.pill{
-background:#142c4d;color:#ffdf58;border:2px solid #f6cb4b;
-border-radius:30px;padding:7px 13px;font-weight:900;font-size:clamp(10px,2vw,15px);
-box-shadow:0 4px 10px #0004
-}
-.smallBtn{background:#182d4c;color:white;border-radius:20px;padding:8px 14px;font-weight:bold}
-#bottom{
-flex:1;min-height:0;display:flex;flex-direction:column;
-padding:clamp(5px,1.5vw,12px);gap:clamp(5px,1vw,9px);
-background:linear-gradient(135deg,#101a32,#1d3150);
-overflow:hidden
-}
-#status{
-flex:none;display:flex;align-items:center;justify-content:space-between;
-gap:5px;background:#24344e;border:1px solid #536781;
-border-radius:13px;padding:7px 10px;min-height:43px
-}
-#playerName{font-weight:900;color:#ffdb4e;font-size:clamp(12px,2.5vw,18px)}
-#subject{font-weight:900;color:white;background:#853be4;padding:5px 10px;border-radius:9px;font-size:clamp(9px,2vw,13px)}
-#progress{color:#72edff;font-size:clamp(10px,2vw,15px);font-weight:900;white-space:nowrap}
-#bar{height:5px;background:#101a2c;border-radius:10px;overflow:hidden;flex:1;max-width:90px}
-#barFill{height:100%;width:0;background:#52edbb}
-#questionBox{
-flex:1;min-height:0;display:flex;flex-direction:column;gap:6px;
-justify-content:center;background:#263752;border:1px solid #536b89;
-border-radius:14px;padding:clamp(8px,1.5vw,14px);
-}
-#questionNo{font-size:clamp(9px,1.8vw,12px);color:#a9c8e9;font-weight:bold}
-#question{
-font-size:clamp(14px,2.8vw,23px);line-height:1.25;
-font-weight:900;text-align:center;overflow-wrap:anywhere
-}
-#answers{
-display:grid;grid-template-columns:1fr 1fr;
-grid-template-rows:1fr 1fr;gap:7px;flex:1;min-height:0
-}
-.answer{
-border-radius:12px;color:white;font-weight:900;
-font-size:clamp(12px,2.5vw,19px);
-border:2px solid #ffffff55;box-shadow:0 3px 0 #0003;
-min-height:0;padding:5px;overflow-wrap:anywhere;
-transition:transform .12s,filter .12s
-}
-.answer:active{transform:scale(.96)}
-.answer:nth-child(1){background:linear-gradient(135deg,#f05a64,#c52d4d)}
-.answer:nth-child(2){background:linear-gradient(135deg,#348fe0,#2155a6)}
-.answer:nth-child(3){background:linear-gradient(135deg,#27b98b,#14775c)}
-.answer:nth-child(4){background:linear-gradient(135deg,#a35be9,#6732b4)}
-.answer:disabled{opacity:.8}
-#feedback{
-min-height:20px;flex:none;text-align:center;font-weight:900;
-font-size:clamp(11px,2vw,16px);color:#ffe77d
-}
-#menu{
-position:absolute;inset:0;z-index:10;
-display:flex;align-items:center;justify-content:center;
-background:linear-gradient(140deg,#103a70ee,#24124cee);
-padding:15px;overflow:auto
-}
-.panel{
-width:min(570px,100%);max-height:100%;overflow:auto;
-background:linear-gradient(145deg,#274c77,#172443);
-border:3px solid #f7d66b;border-radius:22px;
-padding:clamp(13px,3vw,25px);text-align:center;
-box-shadow:0 15px 45px #0008
-}
-.logo{font-size:clamp(24px,6vw,42px);font-weight:1000;
-color:#ffdf51;text-shadow:0 4px #a94b18,0 7px 12px #0008}
-.sublogo{font-weight:900;letter-spacing:2px;color:#a9eaff}
-.field{width:100%;padding:10px;border-radius:10px;border:2px solid #7894b5;background:#fff;color:#17233c;margin:5px 0}
-.primary{
-background:linear-gradient(#ffe875,#ffad26);color:#542a06;
-font-weight:1000;padding:12px 20px;border-radius:13px;
-box-shadow:0 4px 0 #a85b16;margin:5px
-}
-.secondary{background:#3867a3;color:white;font-weight:bold;padding:10px 15px;border-radius:12px;margin:4px}
-#setup{display:none}
-#pauseScreen{display:none;position:absolute;inset:0;z-index:9;background:#101a2ddd;align-items:center;justify-content:center}
-#pauseScreen .panel{width:min(340px,90%)}
-#toast{
-position:absolute;z-index:8;left:50%;top:42%;transform:translate(-50%,-50%);
-font-size:clamp(22px,5vw,42px);font-weight:1000;
-color:#ffe65c;text-shadow:0 4px 4px #000;pointer-events:none;
-opacity:0;transition:opacity .2s
-}
-#rotate{display:none;position:fixed;inset:0;z-index:20;background:#132747;align-items:center;justify-content:center;text-align:center;padding:20px}
-@media (orientation:portrait){
-#rotate{display:flex}
-}
-@media(max-height:400px) and (orientation:landscape){
-#top{height:34%}
-#bottom{padding:4px;gap:3px}
-#status{min-height:30px;padding:3px 7px}
-#questionBox{padding:5px;gap:3px}
-#question{font-size:clamp(12px,2.4vw,17px)}
+.cloud{position:absolute;background:#fff;border-radius:50px;width:65px;height:19px;opacity:.8}
+.cloud:before,.cloud:after{content:"";position:absolute;background:white;border-radius:50%}
+.cloud:before{width:28px;height:28px;top:-13px;left:12px}
+.cloud:after{width:35px;height:35px;top:-18px;left:30px}
+#cloud1{top:18%;left:10%}#cloud2{top:12%;right:20%}
+#sun{position:absolute;right:8%;top:8%;width:45px;height:45px;background:#ffe77b;border-radius:50%;box-shadow:0 0 30px #fff}
+#stands{position:absolute;top:32%;width:100%;height:16%;background:repeating-linear-gradient(90deg,#ec4c77 0 15px,#ffdf61 15px 30px);border-block:4px solid white}
+#track{position:absolute;bottom:0;width:100%;height:53%;background:repeating-linear-gradient(0deg,#d83b46 0 28px,#f5f5f5 28px 32px)}
+#track:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 50px,#ffffff22 51px 53px)}
+#finish{position:absolute;right:5%;top:0;height:100%;width:20px;background:repeating-conic-gradient(#fff 0 25%,#222 0 50%) 0/16px 16px}
+#raceCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:2}
+#raceHeader{position:absolute;z-index:3;top:7px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:center}
+.pill{background:#173052;border:2px solid #ffdc54;border-radius:25px;padding:6px 10px;font-weight:bold;font-size:clamp(10px,2vw,14px)}
+#pause{background:#173052;color:white;border-radius:20px;padding:7px 12px;font-weight:bold}
+#quiz{flex:1;min-height:0;padding:7px;display:flex;flex-direction:column;gap:6px;background:linear-gradient(140deg,#111d38,#263e5d)}
+#status{flex:none;display:flex;align-items:center;justify-content:space-between;gap:5px;padding:6px 9px;border-radius:12px;background:#344968;border:1px solid #7891ad}
+#playerName{font-weight:900;color:#ffe16c;font-size:clamp(11px,2.5vw,17px)}
+#subject{background:#8548cf;padding:5px 8px;border-radius:8px;font-size:clamp(9px,1.8vw,12px);font-weight:bold}
+#progress{font-size:clamp(10px,2vw,14px);font-weight:bold;color:#8ff4ff;white-space:nowrap}
+#progressBar{height:5px;width:65px;background:#17243a;border-radius:9px;overflow:hidden}
+#fill{height:100%;width:0;background:#50edb4}
+#questionBox{flex:1;min-height:0;background:#263b58;border:1px solid #637b9a;border-radius:13px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;padding:7px}
+#qNo{font-size:clamp(9px,1.8vw,12px);color:#a9c9e9;font-weight:bold}
+#question{font-size:clamp(14px,2.7vw,22px);font-weight:900;text-align:center;line-height:1.25;overflow-wrap:anywhere}
+#answers{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:7px}
+.answer{border:2px solid #ffffff55;border-radius:12px;color:white;font-size:clamp(12px,2.5vw,19px);font-weight:900;padding:5px;min-height:0;overflow-wrap:anywhere;box-shadow:0 3px 0 #0005}
+.answer:nth-child(1){background:linear-gradient(130deg,#f15d69,#b72d4d)}
+.answer:nth-child(2){background:linear-gradient(130deg,#3998e6,#2454a2)}
+.answer:nth-child(3){background:linear-gradient(130deg,#29b98b,#147253)}
+.answer:nth-child(4){background:linear-gradient(130deg,#a45ce6,#6734ae)}
+.answer:disabled{opacity:.65}
+#feedback{flex:none;text-align:center;min-height:19px;font-weight:bold;color:#ffe77c;font-size:clamp(10px,2vw,14px)}
+.overlay{position:fixed;inset:0;z-index:10;background:#101a32ed;display:flex;align-items:center;justify-content:center;padding:12px}
+.panel{width:min(550px,100%);max-height:95%;overflow:auto;text-align:center;padding:18px;border:3px solid #ffdc62;border-radius:22px;background:linear-gradient(145deg,#315781,#182747);box-shadow:0 15px 40px #0009}
+.logo{font-size:clamp(25px,6vw,43px);font-weight:1000;color:#ffe16c;text-shadow:0 4px #a44e16}
+.field{width:100%;padding:10px;margin:4px 0;border:2px solid #91aac8;border-radius:9px;background:white;color:#15243c}
+.primary{background:linear-gradient(#ffec8b,#ffad27);color:#542b08;padding:12px 18px;border-radius:12px;font-weight:1000;box-shadow:0 4px #a55b17;margin:5px}
+.secondary{background:#426c9f;color:white;padding:10px 15px;border-radius:11px;font-weight:bold;margin:4px}
+.hidden{display:none!important}
+#rotate{display:none;position:fixed;inset:0;background:#10234a;z-index:30;align-items:center;justify-content:center;text-align:center;padding:20px}
+@media(orientation:portrait){#rotate{display:flex}}
+@media(max-height:420px) and (orientation:landscape){
+#race{height:33%}
+#quiz{padding:4px;gap:3px}
+#status{padding:3px 6px}
+#questionBox{padding:4px;gap:2px}
+#question{font-size:clamp(12px,2.3vw,17px)}
 .answer{font-size:clamp(10px,2vw,15px);padding:3px}
-#feedback{min-height:14px;font-size:10px}
+#feedback{min-height:13px}
 }
 </style>
 </head>
 <body>
 <div id="app">
- <section id="top">
-  <div id="sky"></div><div id="sun"></div><div id="stadium"></div>
-  <div id="track"><div id="finish"></div></div>
-  <canvas id="raceCanvas"></canvas>
-  <div id="raceTop">
-   <div class="pill">🏆 SASARAN: 50 JAWAPAN BETUL</div>
-   <button class="smallBtn" onclick="pauseGame()">PAUSE ⏸</button>
-  </div>
- </section>
- <section id="bottom">
-  <div id="status">
-   <div><div id="turnLabel" style="font-size:9px;color:#abc">GILIRAN MENJAWAB</div><div id="playerName">PEMAIN 1</div></div>
-   <div id="subject">AGAMA ISLAM</div>
-   <div id="progress">0 / 50</div>
-   <div id="bar"><div id="barFill"></div></div>
-  </div>
-  <div id="questionBox">
-   <div id="questionNo">SOALAN 1</div>
-   <div id="question">Selamat datang ke KIDZ SMART RACE!</div>
-   <div id="answers">
-    <button class="answer" onclick="answer(0)">A</button>
-    <button class="answer" onclick="answer(1)">B</button>
-    <button class="answer" onclick="answer(2)">C</button>
-    <button class="answer" onclick="answer(3)">D</button>
-   </div>
-  </div>
-  <div id="feedback">Pilih jawapan yang betul!</div>
- </section>
- <div id="toast"></div>
- <div id="menu">
-  <div class="panel" id="mainMenu">
-   <div class="logo">KIDZ SMART RACE</div>
-   <div class="sublogo">LARI • FIKIR • BELAJAR • MENANG</div>
-   <div style="font-size:54px;margin:10px">🐱 🐻 🐰 🐯</div>
-   <p>Perlumbaan ilmu paling menyeronokkan!</p>
-   <button class="primary" onclick="showSetup()">MULA PERMAINAN ▶</button>
-   <p style="font-size:12px;color:#c6d9ee">4 subjek • 500+ soalan • 3–4 pemain</p>
-   <button class="secondary" onclick="fullScreen()">FULLSCREEN ⛶</button>
-  </div>
-  <div class="panel" id="setup">
-   <h2>🏁 DAFTAR PEMAIN</h2>
-   <label>Bilangan pemain</label>
-   <select id="playerCount" class="field" onchange="makeFields()">
-    <option value="3">3 Pemain</option><option value="4">4 Pemain</option>
-   </select>
-   <div id="playerFields"></div>
-   <label>Pilih umur</label>
-   <select id="age" class="field">
-    <option value="4">4 tahun</option><option value="5">5 tahun</option>
-    <option value="6" selected>6 tahun</option><option value="7">7 tahun</option>
-    <option value="8">8 tahun</option><option value="9">9 tahun</option>
-   </select>
-   <label>Pilih subjek</label>
-   <select id="subjectChoice" class="field">
-    <option value="all">Semua Subjek</option>
-    <option value="agama">Agama Islam</option>
-    <option value="bm">Bahasa Melayu</option>
-    <option value="math">Matematik</option>
-    <option value="iq">Cabaran Minda</option>
-   </select>
-   <button class="primary" onclick="startGame()">MULA PERLUMBAAN 🏁</button>
-   <button class="secondary" onclick="backMenu()">KEMBALI</button>
-  </div>
- </div>
- <div id="pauseScreen">
-  <div class="panel"><h2>⏸ PERMAINAN DIJEDA</h2>
-   <button class="primary" onclick="resumeGame()">SAMBUNG</button>
-   <button class="secondary" onclick="location.reload()">MULA SEMULA</button>
-  </div>
- </div>
- <div id="rotate"><div><div style="font-size:65px">📱</div><h2>PUSINGKAN TELEFON</h2><p>Sila gunakan telefon secara melintang untuk bermain.</p></div></div>
+<section id="race">
+<div class="cloud" id="cloud1"></div><div class="cloud" id="cloud2"></div><div id="sun"></div>
+<div id="stands"></div>
+<div id="track"><div id="finish"></div></div>
+<canvas id="raceCanvas"></canvas>
+<div id="raceHeader">
+<div class="pill">🏆 KIDZ SMART RACE</div>
+<button id="pause" onclick="pauseGame()">⏸ PAUSE</button>
 </div>
+</section>
+
+<section id="quiz">
+<div id="status">
+<div><div style="font-size:9px;color:#c5d9ef">GILIRAN PEMAIN</div><div id="playerName">PEMAIN 1</div></div>
+<div id="subject">AGAMA ISLAM</div>
+<div id="progress">0/50</div>
+<div id="progressBar"><div id="fill"></div></div>
+</div>
+<div id="questionBox">
+<div id="qNo">SOALAN 1</div>
+<div id="question">Selamat datang ke KIDZ SMART RACE!</div>
+</div>
+<div id="answers">
+<button class="answer" onclick="answer(0)">A</button>
+<button class="answer" onclick="answer(1)">B</button>
+<button class="answer" onclick="answer(2)">C</button>
+<button class="answer" onclick="answer(3)">D</button>
+</div>
+<div id="feedback">Bersedia untuk berlumba!</div>
+</section>
+</div>
+
+<div id="menu" class="overlay">
+<div class="panel" id="home">
+<div class="logo">KIDZ SMART RACE</div>
+<p style="color:#b9eaff;font-weight:bold;letter-spacing:2px">LARI • FIKIR • BELAJAR • MENANG</p>
+<div style="font-size:55px;margin:12px">🐱 🐻 🐰 🐯</div>
+<p>Perlumbaan ilmu untuk kanak-kanak!</p>
+<button class="primary" onclick="showSetup()">MULA PERMAINAN ▶</button><br>
+<button class="secondary" onclick="goFullscreen()">FULLSCREEN ⛶</button>
+<p style="font-size:11px">3–4 pemain • 4 subjek • 50 jawapan betul</p>
+</div>
+<div class="panel hidden" id="setup">
+<h2>🏁 PENDAFTARAN PEMAIN</h2>
+<label>Bilangan pemain</label>
+<select class="field" id="playerCount" onchange="makeFields()">
+<option value="3">3 pemain</option><option value="4">4 pemain</option>
+</select>
+<div id="playerFields"></div>
+<label>Umur pemain</label>
+<select class="field" id="age">
+<option value="4">4 tahun</option><option value="5">5 tahun</option>
+<option value="6" selected>6 tahun</option><option value="7">7 tahun</option>
+<option value="8">8 tahun</option><option value="9">9 tahun</option>
+</select>
+<label>Subjek permainan</label>
+<select class="field" id="subjectChoice">
+<option value="all">Semua subjek</option>
+<option value="agama">Agama Islam</option>
+<option value="bm">Bahasa Melayu</option>
+<option value="math">Matematik</option>
+<option value="iq">Cabaran Minda</option>
+</select>
+<button class="primary" onclick="startGame()">MULA PERLUMBAAN 🏁</button>
+<button class="secondary" onclick="backHome()">KEMBALI</button>
+<div id="setupError" style="color:#ffe16c;font-size:12px"></div>
+</div>
+</div>
+
+<div id="pauseScreen" class="overlay hidden">
+<div class="panel"><h2>⏸ PERMAINAN DIJEDA</h2>
+<button class="primary" onclick="resumeGame()">SAMBUNG</button>
+<button class="secondary" onclick="quitGame()">KELUAR KE MENU</button>
+</div>
+</div>
+
+<div id="rotate"><div><div style="font-size:65px">📱</div><h2>PUSINGKAN TELEFON</h2><p>Sila gunakan skrin melintang.</p></div></div>
+
 <script>
-/* =========================================
-   BANK SOALAN – 500 SOALAN BER-ID UNIK
-   125 soalan setiap subjek.
-========================================= */
+"use strict";
+
+/* CHARACTER */
+const skins=[
+{name:"KIKO",emoji:"🐱",color:"#efa34e"},
+{name:"BOBO",emoji:"🐻",color:"#a76a42"},
+{name:"MIMI",emoji:"🐰",color:"#ef9fc9"},
+{name:"TIMO",emoji:"🐯",color:"#f28c35"},
+{name:"LALA",emoji:"🐼",color:"#eee"},
+{name:"RIKO",emoji:"🦖",color:"#52c77b"},
+{name:"COCO",emoji:"🐵",color:"#b97b42"},
+{name:"ZUZU",emoji:"🦒",color:"#edbd4b"}
+];
+
+/* BANK SOALAN */
 const bank=[];
-function add(subject,age,q,opts,correct,explain){
- bank.push({id:subject+"-"+String(bank.length+1).padStart(4,"0"),
- subject,age,q,opts,correct,explain});
+function add(s,a,q,o,c,e){
+bank.push({id:s+"-"+bank.length,q:q,subject:s,age:a,opts:o,correct:c,explain:e});
 }
-const agama=[
+const facts={
+agama:[
 ["Rukun Islam ada berapa?","Lima","Tiga","Enam","Dua",0],
 ["Apakah kitab suci umat Islam?","Al-Quran","Taurat","Zabur","Injil",0],
 ["Siapakah nabi terakhir?","Nabi Muhammad","Nabi Musa","Nabi Isa","Nabi Ibrahim",0],
 ["Berapa kali solat fardu sehari?","Lima","Tiga","Empat","Enam",0],
-["Apakah arah umat Islam menghadap ketika solat?","Kiblat","Utara","Selatan","Timur",0],
-["Bulan apakah umat Islam berpuasa?","Ramadan","Syawal","Muharam","Rejab",0],
-["Apakah nama rumah ibadah umat Islam?","Masjid","Gereja","Kuil","Tokong",0],
-["Apakah ucapan apabila bertemu sesama Muslim?","Assalamualaikum","Selamat malam","Terima kasih","Selamat jalan",0],
-["Apakah yang digunakan untuk berwuduk?","Air bersih","Minyak","Pasir sahaja","Susu",0],
-["Siapakah yang mencipta alam ini?","Allah","Manusia","Haiwan","Malaikat",0],
-["Apakah nama hari raya selepas Ramadan?","Aidilfitri","Aidiladha","Deepavali","Krismas",0],
-["Apakah perbuatan memberi kepada orang memerlukan?","Sedekah","Mengejek","Bergaduh","Menipu",0],
+["Apakah arah umat Islam ketika solat?","Kiblat","Utara","Selatan","Barat",0],
+["Bulan umat Islam berpuasa?","Ramadan","Syawal","Safar","Rejab",0],
+["Tempat umat Islam bersolat berjemaah?","Masjid","Sekolah","Pasar","Padang",0],
+["Apakah ucapan salam?","Assalamualaikum","Selamat jalan","Terima kasih","Selamat tidur",0],
+["Apakah digunakan untuk berwuduk?","Air bersih","Minyak","Susu","Jus",0],
+["Siapakah pencipta alam?","Allah","Manusia","Haiwan","Malaikat",0],
+["Hari raya selepas Ramadan?","Aidilfitri","Aidiladha","Deepavali","Krismas",0],
+["Memberi kepada orang memerlukan disebut?","Sedekah","Mengejek","Menipu","Bergaduh",0],
 ["Siapakah ibu Nabi Isa?","Maryam","Hawa","Aminah","Khadijah",0],
-["Apakah nama malaikat yang menyampaikan wahyu?","Jibril","Mikail","Israfil","Izrail",0],
-["Apakah ucapan sebelum makan?","Bismillah","Selamat pagi","Alhamdulillah sahaja","Selamat tidur",0],
-["Apakah ucapan selepas makan?","Alhamdulillah","Bismillah","Subhanallah sahaja","Selamat tinggal",0],
-["Apakah nama bulan pertama kalendar Hijrah?","Muharam","Ramadan","Syawal","Safar",0],
-["Apakah nama perayaan korban?","Aidiladha","Aidilfitri","Tahun Baru","Maulidur Rasul",0],
-["Siapakah nabi yang membina bahtera?","Nabi Nuh","Nabi Yusuf","Nabi Yunus","Nabi Daud",0],
-["Apakah perbuatan bercakap benar?","Jujur","Menipu","Mengumpat","Mengejek",0],
-["Apakah yang perlu dilakukan sebelum solat?","Berwuduk","Bermain","Makan","Tidur",0],
-["Apakah nama tempat mengelilingi Kaabah?","Tawaf","Saie","Wukuf","Tahallul",0],
-["Apakah nama air yang terkenal di Makkah?","Air zamzam","Air laut","Air hujan","Air sungai",0],
-["Apakah sikap terhadap ibu bapa?","Hormat","Derhaka","Mengejek","Mengabaikan",0],
-["Apakah ucapan ketika bersyukur?","Alhamdulillah","Selamat jalan","Maaf","Jumpa lagi",0]
-];
-const bm=[
-["Huruf pertama dalam abjad ialah?","A","B","C","D",0],
-["Apakah huruf selepas B?","C","A","D","E",0],
-["Perkataan yang bermula dengan huruf K untuk haiwan?","Kucing","Meja","Buku","Pintu",0],
-["Apakah lawan perkataan besar?","Kecil","Tinggi","Panjang","Luas",0],
-["Apakah lawan perkataan panas?","Sejuk","Hangat","Terik","Cerah",0],
-["Apakah sinonim bagi gembira?","Suka hati","Sedih","Marah","Takut",0],
-["Berapakah suku kata bagi perkataan buku?","Dua","Satu","Tiga","Empat",0],
-["Apakah kata kerja dalam ayat Ali berlari?","Berlari","Ali","Ayat","Dalam",0],
-["Apakah warna daun yang sihat?","Hijau","Biru","Hitam","Ungu",0],
-["Apakah penjodoh bilangan bagi seekor kucing?","Ekor","Batang","Biji","Utas",0],
-["Apakah huruf vokal?","A","B","C","D",0],
-["Apakah nama benda untuk menulis?","Pensel","Kasut","Pinggan","Bantal",0],
-["Apakah lawan perkataan tinggi?","Rendah","Panjang","Besar","Lebar",0],
-["Apakah perkataan yang betul?","Sekolah","Skolah","Sekola","Sekoalah",0],
-["Apakah kata nama bagi haiwan yang menyalak?","Anjing","Makan","Cantik","Laju",0],
-["Apakah lawan perkataan siang?","Malam","Pagi","Petang","Tengah hari",0],
-["Apakah kata adjektif dalam frasa bunga cantik?","Cantik","Bunga","Dan","Di",0],
-["Apakah nama tempat murid belajar?","Sekolah","Hospital","Pasar","Stesen",0],
-["Apakah tanda di hujung ayat penyata?","Noktah","Koma","Sempang","Kurungan",0],
-["Apakah perkataan yang sama maksud dengan pantas?","Cepat","Lambat","Lemah","Diam",0],
-["Apakah lawan perkataan rajin?","Malas","Bijak","Ceria","Sopan",0],
-["Apakah nama anggota untuk mendengar?","Telinga","Mata","Hidung","Mulut",0],
-["Apakah kata kerja bagi aktiviti menggunakan buku?","Membaca","Tidur","Menyanyi","Melompat",0],
-["Apakah warna langit cerah pada siang hari?","Biru","Hitam","Coklat","Kelabu",0],
-["Apakah nama tempat membeli barang?","Kedai","Padang","Tandas","Bilik",0]
-];
-const iqFacts=[
-["Apakah nombor seterusnya: 2, 4, 6, 8, ?","10","9","11","12",0],
-["Apakah bentuk yang mempunyai tiga sisi?","Segi tiga","Bulatan","Segi empat","Bujur",0],
-["Yang manakah berbeza?","Epal","Pisang","Oren","Kerusi",3],
-["Apakah nombor seterusnya: 5, 10, 15, ?","20","16","18","25",0],
-["Yang manakah boleh terbang?","Burung","Ikan","Kucing","Lembu",0],
-["Apakah bentuk roda?","Bulatan","Segi tiga","Segi empat","Bintang",0],
-["Jika hari ini Isnin, esok hari apa?","Selasa","Ahad","Rabu","Jumaat",0],
+["Malaikat yang menyampaikan wahyu?","Jibril","Mikail","Israfil","Izrail",0],
+["Ucapan sebelum makan?","Bismillah","Selamat pagi","Selamat tidur","Terima kasih",0],
+["Ucapan selepas makan?","Alhamdulillah","Selamat jalan","Bismillah","Selamat malam",0],
+["Bulan pertama Hijrah?","Muharam","Ramadan","Syawal","Rejab",0],
+["Perayaan ibadah korban?","Aidiladha","Aidilfitri","Tahun Baru","Maulidur Rasul",0],
+["Nabi yang membina bahtera?","Nabi Nuh","Nabi Yusuf","Nabi Yunus","Nabi Daud",0],
+["Bercakap benar ialah sikap?","Jujur","Menipu","Mengumpat","Mengejek",0],
+["Apakah perlu dibuat sebelum solat?","Berwuduk","Bermain","Tidur","Makan",0],
+["Mengelilingi Kaabah disebut?","Tawaf","Saie","Wukuf","Tahallul",0],
+["Air terkenal di Makkah?","Air zamzam","Air laut","Air sungai","Air tasik",0],
+["Bagaimana sikap terhadap ibu bapa?","Hormat","Derhaka","Mengejek","Mengabaikan",0],
+["Ucapan tanda bersyukur?","Alhamdulillah","Selamat jalan","Jumpa lagi","Maaf",0]
+],
+bm:[
+["Huruf pertama abjad?","A","B","C","D",0],
+["Huruf selepas B?","C","A","D","E",0],
+["Haiwan bermula dengan K?","Kucing","Meja","Buku","Pintu",0],
+["Lawan perkataan besar?","Kecil","Tinggi","Panjang","Luas",0],
+["Lawan perkataan panas?","Sejuk","Hangat","Terik","Cerah",0],
+["Sinonim bagi gembira?","Suka hati","Sedih","Marah","Takut",0],
+["Berapakah suku kata buku?","Dua","Satu","Tiga","Empat",0],
+["Kata kerja dalam ayat Ali berlari?","Berlari","Ali","Dalam","Ayat",0],
+["Warna daun yang sihat?","Hijau","Biru","Hitam","Ungu",0],
+["Penjodoh bilangan kucing?","Ekor","Batang","Biji","Utas",0],
+["Yang manakah huruf vokal?","A","B","C","D",0],
+["Benda yang digunakan untuk menulis?","Pensel","Kasut","Pinggan","Bantal",0],
+["Lawan perkataan tinggi?","Rendah","Panjang","Besar","Lebar",0],
+["Ejaan yang betul?","Sekolah","Skolah","Sekola","Sekoalah",0],
+["Haiwan yang menyalak?","Anjing","Kucing","Ikan","Ayam",0],
+["Lawan perkataan siang?","Malam","Pagi","Petang","Subuh",0],
+["Kata adjektif dalam bunga cantik?","Cantik","Bunga","Dan","Di",0],
+["Tempat murid belajar?","Sekolah","Hospital","Pasar","Stesen",0],
+["Tanda di hujung ayat penyata?","Noktah","Koma","Sempang","Kurungan",0],
+["Sinonim bagi pantas?","Cepat","Lambat","Lemah","Diam",0],
+["Lawan perkataan rajin?","Malas","Bijak","Ceria","Sopan",0],
+["Anggota untuk mendengar?","Telinga","Mata","Hidung","Mulut",0],
+["Aktiviti menggunakan buku?","Membaca","Tidur","Menyanyi","Melompat",0],
+["Warna langit cerah?","Biru","Hitam","Coklat","Kelabu",0],
+["Tempat membeli barang?","Kedai","Padang","Tandas","Bilik",0]
+],
+iq:[
+["Nombor seterusnya: 2, 4, 6, 8, ?","10","9","11","12",0],
+["Bentuk yang mempunyai tiga sisi?","Segi tiga","Bulatan","Segi empat","Bujur",0],
+["Yang manakah berbeza?","Kerusi","Epal","Pisang","Oren",0],
+["Nombor seterusnya: 5, 10, 15, ?","20","16","18","25",0],
+["Haiwan yang boleh terbang?","Burung","Ikan","Kucing","Lembu",0],
+["Bentuk roda?","Bulatan","Segi tiga","Segi empat","Bintang",0],
+["Jika Isnin, esok hari apa?","Selasa","Ahad","Rabu","Jumaat",0],
 ["Yang manakah paling kecil?","Semut","Kucing","Gajah","Kuda",0],
-["Apakah nombor yang hilang: 1, 2, 3, ?, 5","4","6","7","8",0],
+["Nombor hilang: 1, 2, 3, ?, 5","4","6","7","8",0],
 ["Yang manakah bukan buah?","Meja","Epal","Mangga","Pisang",0],
-["Apakah pasangan kasut?","Dua","Tiga","Empat","Lima",0],
-["Apakah yang datang selepas pagi?","Tengah hari","Malam","Subuh","Tengah malam",0],
-["Yang manakah hidup di dalam air?","Ikan","Ayam","Kucing","Arnab",0],
-["Apakah bentuk muka jam?","Bulatan","Segi tiga","Segi empat panjang","Bintang",0],
-["Jika ada 3 burung dan 1 terbang, berapa tinggal?","2","1","3","4",0],
-["Apakah yang lebih berat?","Gajah","Kucing","Semut","Rama-rama",0],
-["Apakah nombor sebelum 10?","9","8","11","7",0],
-["Yang manakah digunakan ketika hujan?","Payung","Kipas","Cermin mata","Topi keledar",0],
-["Apakah warna hasil campuran merah dan kuning?","Jingga","Hijau","Biru","Ungu",0],
-["Jika semua ikan berenang, apakah ikan gunakan?","Sirip","Sayap","Kaki","Tanduk",0],
-["Apakah yang tidak sesuai di dapur?","Bantal tidur","Periuk","Sudip","Pinggan",0],
-["Apakah susunan dari kecil ke besar?","Semut, kucing, gajah","Gajah, kucing, semut","Kucing, semut, gajah","Gajah, semut, kucing",0],
-["Apakah nombor seterusnya: 10, 9, 8, 7, ?","6","5","8","4",0],
-["Apakah yang digunakan untuk melihat masa?","Jam","Sudu","Buku","Kasut",0],
+["Sepasang kasut mempunyai berapa kasut?","Dua","Tiga","Empat","Lima",0],
+["Selepas pagi ialah?","Tengah hari","Malam","Subuh","Tengah malam",0],
+["Haiwan yang hidup dalam air?","Ikan","Ayam","Kucing","Arnab",0],
+["Bentuk muka jam?","Bulatan","Segi tiga","Segi empat","Bintang",0],
+["Ada 3 burung, 1 terbang. Berapa tinggal?","2","1","3","4",0],
+["Haiwan paling berat?","Gajah","Kucing","Semut","Rama-rama",0],
+["Nombor sebelum 10?","9","8","11","7",0],
+["Digunakan ketika hujan?","Payung","Kipas","Sudu","Bantal",0],
+["Merah dicampur kuning menjadi?","Jingga","Hijau","Biru","Ungu",0],
+["Ikan berenang menggunakan?","Sirip","Sayap","Tanduk","Kasut",0],
+["Yang tidak sesuai di dapur?","Bantal tidur","Periuk","Sudip","Pinggan",0],
+["Susunan kecil ke besar?","Semut, kucing, gajah","Gajah, kucing, semut","Kucing, semut, gajah","Gajah, semut, kucing",0],
+["Nombor seterusnya: 10, 9, 8, 7, ?","6","5","8","4",0],
+["Digunakan untuk melihat masa?","Jam","Sudu","Buku","Kasut",0],
 ["Jika lampu dipadam, bilik menjadi?","Gelap","Terang","Panas","Bising",0]
+]
+};
+const templates=[
+x=>x,
+x=>"Pilih jawapan yang betul: "+x,
+x=>"Mari belajar! "+x,
+x=>"Cuba fikir dan jawab: "+x,
+x=>"Manakah jawapan yang tepat? "+x
 ];
-const mathItems=[
-[1,1,"tambah"],[2,3,"tambah"],[4,2,"tambah"],[5,3,"tambah"],
-[6,2,"tambah"],[7,1,"tambah"],[8,2,"tambah"],[9,1,"tambah"],
-[10,5,"tambah"],[3,3,"tambah"],[5,2,"tolak"],[8,3,"tolak"],
-[9,4,"tolak"],[10,2,"tolak"],[7,3,"tolak"],[6,1,"tolak"],
-[12,5,"tolak"],[15,5,"tolak"],[14,4,"tolak"],[20,10,"tolak"],
-[2,2,"darab"],[3,2,"darab"],[4,2,"darab"],[5,2,"darab"],[3,3,"darab"]
+for(const subject of ["agama","bm","iq"]){
+for(let i=0;i<125;i++){
+let f=facts[subject][i%25];
+let form=templates[Math.floor(i/25)];
+add(subject,4+(i%6),form(f[0]),[f[1],f[2],f[3],f[4]],0,"Jawapan: "+f[1]+".");
+}
+}
+const mathPairs=[
+[1,1,"+"],[2,3,"+"],[4,2,"+"],[5,3,"+"],[6,2,"+"],
+[7,1,"+"],[8,2,"+"],[9,1,"+"],[10,5,"+"],[3,3,"+"],
+[5,2,"-"],[8,3,"-"],[9,4,"-"],[10,2,"-"],[7,3,"-"],
+[6,1,"-"],[12,5,"-"],[15,5,"-"],[14,4,"-"],[20,10,"-"],
+[2,2,"×"],[3,2,"×"],[4,2,"×"],[5,2,"×"],[3,3,"×"]
 ];
-function makeOptions(correct,seed){
- let vals=[correct,correct+1,Math.max(0,correct-1),correct+2];
- if(typeof correct==="string"){
-   vals=[correct,"Tidak pasti","Tidak berkaitan","Tiada"];
- }
- let offset=seed%4;
- vals=vals.map((v,i)=>vals[(i+offset)%4]);
- return {opts:vals.map(String),correct:vals.indexOf(String(correct))};
-}
 for(let i=0;i<125;i++){
- let f=agama[i%25],v=i%5;
- let forms=[
- x=>x[0],
- x=>"Pilih jawapan yang tepat: "+x[0],
- x=>"Apakah jawapan bagi soalan berikut? "+x[0],
- x=>"Uji pengetahuan agama: "+x[0],
- x=>"Manakah jawapan yang betul? "+x[0]
- ];
- let q=forms[v](f);
- let opts=[f[1],f[2],f[3],f[4]];
- add("agama",4+(i%6),q,opts,0,"Jawapan: "+f[1]+".");
+let [a,b,op]=mathPairs[i%25];
+let ans=op==="+"?a+b:op==="-"?a-b:a*b;
+let q=`${a} ${op} ${b} = ?`;
+let vals=[ans,ans+1,Math.max(0,ans-1),ans+2];
+let shift=Math.floor(i/25)%4;
+vals=vals.slice(shift).concat(vals.slice(0,shift));
+add("math",4+i%6,templates[Math.floor(i/25)](q),vals.map(String),vals.indexOf(ans),"Jawapan ialah "+ans+".");
 }
-for(let i=0;i<125;i++){
- let f=bm[i%25],v=i%5;
- let forms=[
- x=>x[0],
- x=>"Pilih jawapan yang betul. "+x[0],
- x=>"Mari belajar Bahasa Melayu: "+x[0],
- x=>"Cuba fikir dan jawab: "+x[0],
- x=>"Manakah pilihan yang tepat? "+x[0]
- ];
- add("bm",4+(i%6),forms[v](f),[f[1],f[2],f[3],f[4]],0,"Jawapan: "+f[1]+".");
-}
-for(let i=0;i<125;i++){
- let f=mathItems[i%25],v=i%5;
- let a=f[0],b=f[1],op=f[2];
- let correct=op==="tambah"?a+b:op==="tolak"?a-b:a*b;
- let q=op==="tambah"?`${a} + ${b} = ?`:op==="tolak"?`${a} − ${b} = ?`:`${a} × ${b} = ?`;
- let forms=[
- q,"Berapakah hasil "+q,
- "Mari mengira: "+q,
- "Cuba jawab operasi matematik ini: "+q,
- "Uji kepandaian matematik: "+q
- ];
- let o=makeOptions(correct,i);
- add("math",4+(i%6),forms[v],o.opts,o.correct,"Jawapan yang betul ialah "+correct+".");
-}
-for(let i=0;i<125;i++){
- let f=iqFacts[i%25],v=i%5;
- let forms=[
- x=>x[0],
- x=>"Cabaran minda: "+x[0],
- x=>"Cuba fikir dengan teliti: "+x[0],
- x=>"Uji logik kamu: "+x[0],
- x=>"Pilih jawapan paling tepat: "+x[0]
- ];
- add("iq",4+(i%6),forms[v](f),[f[1],f[2],f[3],f[4]],f[5],
- "Jawapan yang tepat ialah "+f[1]+".");
-}
-
-/* =========================================
-   DATA PEMAIN DAN GAME ENGINE
-========================================= */
-const skins=[
-{name:"KIKO",emoji:"🐱",color:"#f5a64d"},
-{name:"BOBO",emoji:"🐻",color:"#a76a42"},
-{name:"MIMI",emoji:"🐰",color:"#f4a6ca"},
-{name:"TIMO",emoji:"🐯",color:"#f28c35"},
-{name:"LALA",emoji:"🐼",color:"#eee"},
-{name:"RIKO",emoji:"🦖",color:"#50c979"},
-{name:"COCO",emoji:"🐵",color:"#b97b42"},
-{name:"ZUZU",emoji:"🦒",color:"#edbd4b"}
-];
-let players=[],turn=0,current=null,used=new Set(),running=false,locked=false;
-let questionNumber=0,filtered=[],animationState=[];
-const names=["KIKI","BOBO","MIMI","TIMO"];
+ 
+/* GAME STATE */
+let players=[],turn=0,current=null,filtered=[],used=new Set();
+let running=false,locked=false,questionNo=0,states=[];
 const $=id=>document.getElementById(id);
-function makeFields(){
- let n=+$("playerCount").value;
- $("playerFields").innerHTML="";
- for(let i=0;i<n;i++){
- let d=document.createElement("div");
- d.innerHTML=`<input class="field" id="name${i}" maxlength="12" placeholder="Nama pemain ${i+1}" value="${names[i]}">
- <select class="field" id="skin${i}">${skins.map((s,j)=>`<option value="${j}">${s.emoji} ${s.name}</option>`).join("")}</select>`;
- $("playerFields").appendChild(d);
- }
-}
+
 function showSetup(){
- $("mainMenu").style.display="none";$("setup").style.display="block";makeFields();
+$("home").classList.add("hidden");
+$("setup").classList.remove("hidden");
+makeFields();
 }
-function backMenu(){$("setup").style.display="none";$("mainMenu").style.display="block"}
-function fullScreen(){
- let el=document.documentElement;
- if(el.requestFullscreen)el.requestFullscreen().catch(()=>{});
- if(screen.orientation?.lock)screen.orientation.lock("landscape").catch(()=>{});
+function backHome(){
+$("setup").classList.add("hidden");
+$("home").classList.remove("hidden");
+}
+function makeFields(){
+let n=Number($("playerCount").value);
+$("playerFields").innerHTML="";
+for(let i=0;i<n;i++){
+let box=document.createElement("div");
+let name=document.createElement("input");
+name.className="field";name.id="name"+i;
+name.placeholder="Nama pemain "+(i+1);
+name.value=["KIKI","BOBO","MIMI","TIMO"][i];
+name.maxLength=15;
+let select=document.createElement("select");
+select.className="field";select.id="skin"+i;
+skins.forEach((s,j)=>{
+let o=document.createElement("option");
+o.value=j;o.textContent=s.emoji+" "+s.name;
+select.appendChild(o);
+});
+select.value=i;
+box.append(name,select);
+$("playerFields").appendChild(box);
+}
+}
+function goFullscreen(){
+let el=document.documentElement;
+if(!document.fullscreenElement&&el.requestFullscreen){
+el.requestFullscreen().catch(()=>{});
+}
+try{screen.orientation?.lock?.("landscape").catch(()=>{});}catch(e){}
 }
 function startGame(){
- let n=+$("playerCount").value;
- players=[];
- for(let i=0;i<n;i++){
- let skin=skins[+$("skin"+i).value];
- players.push({name:$("name"+i).value.trim()||"Pemain "+(i+1),
- skin,correct:0,wrong:0,stars:0,position:0});
- }
- let choice=$("subjectChoice").value;
- filtered=bank.filter(q=>(choice==="all"||q.subject===choice)&&q.age<=+$("age").value);
- used.clear();turn=0;questionNumber=0;running=true;
- $("menu").style.display="none";
- fullScreen();
- makeQuestion();drawRace();
+try{
+const n=Number($("playerCount").value);
+if(n!==3&&n!==4)throw Error("Pilih 3 atau 4 pemain.");
+const newPlayers=[];
+for(let i=0;i<n;i++){
+let name=$("name"+i),skin=$("skin"+i);
+if(!name||!skin)throw Error("Sila lengkapkan maklumat pemain.");
+newPlayers.push({
+name:name.value.trim()||"Pemain "+(i+1),
+skin:skins[Number(skin.value)],
+correct:0,wrong:0,stars:0
+});
+}
+const age=Number($("age").value);
+const subject=$("subjectChoice").value;
+const questions=bank.filter(q=>
+(subject==="all"||q.subject===subject)&&q.age<=age
+);
+if(!questions.length)throw Error("Tiada soalan tersedia.");
+players=newPlayers;
+filtered=questions;
+used=new Set();
+turn=0;questionNo=0;locked=false;running=true;
+states=players.map(()=>"run");
+$("menu").classList.add("hidden");
+$("pauseScreen").classList.add("hidden");
+makeQuestion();
+drawRace();
+goFullscreen();
+}catch(error){
+$("setupError").textContent="Ralat: "+error.message;
+console.error(error);
+}
 }
 function getQuestion(){
- if(!fi
+let available=filtered.filter(q=>!used.has(q.id));
+if(!available.length){
+used.clear();
+available=filtered.slice();
+}
+let q=available[Math.floor(Math.random()*available.length)];
+used.add(q.id);
+return q;
+}
+function subjectText(s){
+return {agama:"AGAMA ISLAM",bm:"BAHASA MELAYU",math:"MATEMATIK",iq:"CABARAN MINDA"}[s];
+}
+function makeQuestion(){
+if(!running)return;
+if(players.some(p=>p.correct>=50)){finishGame();return}
+current=getQuestion();
+if(!current){$("question").textContent="Soalan tidak tersedia.";return}
+locked=false;questionNo++;
+let p=players[turn];
+$("playerName").textContent=p.name;
+$("subject").textContent=subjectText(current.subject);
+$("progress").textContent=p.correct+" / 50";
+$("fill").style.width=(p.correct/50*100)+"%";
+$("qNo").textContent="SOALAN "+questionNo+" • PEMAIN "+(turn+1);
+$("question").textContent=current.q;
+document.querySelectorAll(".answer").forEach((b,i)=>{
+b.disabled=false;
+b.textContent=String.fromCharCode(65+i)+". "+current.opts[i];
+});
+$("feedback").textContent="Pilih jawapan yang betul!";
+}
+function answer(index){
+if(!running||locked||!current)return;
+locked=true;
+let p=players[turn];
+let buttons=document.querySelectorAll(".answer");
+buttons.forEach(b=>b.disabled=true);
+if(index===current.correct){
+p.correct++;p.stars++;
+states[turn]="jump";
+$("feedback").textContent="⭐ BETUL! "+current.explain;
+}else{
+p.wrong++;
+states[turn]="fall";
+$("feedback").textContent="💨 CUBA LAGI! "+current.explain;
+}
+$("progress").textContent=p.correct+" / 50";
+$("fill").style.width=(p.correct/50*100)+"%";
+drawRace();
+setTimeout(()=>{
+if(!running)return;
+states[turn]="run";
+if(p.correct>=50){finishGame();return}
+turn=(turn+1)%players.length;
+makeQuestion();
+drawRace();
+},index===current.correct?1200:1700);
+}
+function pauseGame(){
+if(!running)return;
+running=false;
+$("pauseScreen").classList.remove("hidden");
+}
+function resumeGame(){
+$("pauseScreen").classList.add("hidden");
+running=true;
+drawRace();
+}
+function quitGame(){
+running=false;
+$("pauseScreen").classList.add("hidden");
+$("menu").classList.remove("hidden");
+$("setup").classList.add("hidden");
+$("home").classList.remove("hidden");
+}
+function finishGame(){
+running=false;
+let winner=players.find(p=>p.correct>=50);
+try{localStorage.setItem("kidzSmartRace",JSON.stringify(players));}catch(e){}
+$("menu").classList.remove("hidden");
+$("setup").classList.add("hidden");
+$("home").classList.remove("hidden");
+$("home").innerHTML=`
+<div class="logo">🏆 JUARA!</div>
+<div style="font-size:65px">${winner.skin.emoji}</div>
+<h2 style="color:#ffe16c">${winner.name}</h2>
+<h3>50 JAWAPAN BETUL!</h3>
+<p>Tahniah! Anda juara KIDZ SMART RACE!</p>
+${players.slice().sort((a,b)=>b.correct-a.correct).map((p,i)=>`<p>${i+1}. ${p.name}: ${p.correct} betul • ${p.wrong} salah</p>`).join("")}
+<button class="primary" onclick="location.reload()">MAIN LAGI 🏁</button>`;
+}
+
+/* CANVAS CHARACTER ANIMATION */
+const canvas=$("raceCanvas");
+const ctx=canvas.getContext("2d");
+let frame=0,last=0;
+function resizeCanvas(){
+const r=canvas.getBoundingClientRect();
+const d=Math.min(window.devicePixelRatio||1,2);
+canvas.width=Math.max(1,Math.round(r.width*d));
+canvas.height=Math.max(1,Math.round(r.height*d));
+ctx.setTransform(d,0,0,d,0,0);
+drawRace();
+}
+function character(x,y,skin,phase,state){
+ctx.save();
+ctx.translate(x,y);
+let bounce=state==="fall"?12:Math.sin(phase)*3;
+ctx.translate(0,bounce);
+if(state==="fall")ctx.rotate(-.8);
+let leg=Math.sin(phase*1.8)*9;
+ctx.fillStyle="#0004";
+ctx.beginPath();ctx.ellipse(0,4,18,5,0,0,Math.PI*2);ctx.fill();
+/* legs */
+ctx.strokeStyle="#44313a";ctx.lineWidth=7;ctx.lineCap="round";
+ctx.beginPath();
+ctx.moveTo(-6,-14);ctx.lineTo(-8+leg,-2);
+ctx.moveTo(6,-14);ctx.lineTo(8-leg,-2);ctx.stroke();
+/* shoes */
+ctx.fillStyle="white";
+ctx.fillRect(-18+leg,-5,12,5);
+ctx.fillRect(6-leg,-5,12,5);
+/* body */
+ctx.fillStyle=skin.color;
+ctx.beginPath();ctx.roundRect(-13,-40,26,29,10);ctx.fill();
+/* arms */
+ctx.strokeStyle=skin.color;ctx.lineWidth=7;
+ctx.beginPath();
+ctx.moveTo(-10,-34);ctx.lineTo(-17+leg,-23);
+ctx.moveTo(10,-34);ctx.lineTo(17-leg,-23);ctx.stroke();
+/* head */
+ctx.beginPath();ctx.arc(0,-49,17,0,Math.PI*2);ctx.fill();
+/* ears */
+ctx.beginPath();
+ctx.ellipse(-12,-62,6,9,-.2,0,Math.PI*2);
+ctx.ellipse(12,-62,6,9,.2,0,Math.PI*2);ctx.fill();
+/* eyes */
+ctx.fillStyle="white";
+ctx.beginPath();ctx.arc(-6,-51,4,0,7);ctx.arc(6,-51,4,0,7);ctx.fill();
+ctx.fillStyle="#202030";
+ctx.beginPath();ctx.arc(-6,-51,2,0,7);ctx.arc(6,-51,2,0,7);ctx.fill();
+/* smile */
+ctx.strokeStyle="#49313b";ctx.lineWidth=1.8;
+ctx.beginPath();ctx.arc(0,-44,4,0,Math.PI);ctx.stroke();
+ctx.restore();
+}
+function drawRace(){
+if(!canvas||!ctx)return;
+let w=canvas.clientWidth,h=canvas.clientHeight;
+ctx.clearRect(0,0,w,h);
+if(!players.length)return;
+let lane=h/(players.length+1);
+players.forEach((p,i)=>{
+let y=lane*(i+1)+5;
+ctx.strokeStyle="#ffffff77";ctx.lineWidth=2;
+ctx.setLineDash([8,7]);
+ctx.beginPath();ctx.moveTo(0,y+15);ctx.lineTo(w,y+15);ctx.stroke();
+ctx.setLineDash([]);
+let x=22+(w-90)*(p.correct/50);
+character(x,y,p.skin,frame/5+i*2,states[i]||"run");
+ctx.fillStyle="white";ctx.font="bold 11px Arial";
+ctx.fillText(p.name+" "+p.correct+"/50",Math.min(x+17,w-100),y-27);
+});
+ctx.fillStyle="#fff";ctx.font="bold 11px Arial";
+ctx.fillText("🏁 FINISH",w-65,h-5);
+}
+function animate(t){
+if(t-last>25){
+frame++;if(running)drawRace();last=t;
+}
+requestAnimationFrame(animate);
+}
+new ResizeObserver(resizeCanvas).observe(canvas);
+window.addEventListener("resize",resizeCanvas);
+document.addEventListener("visibilitychange",()=>{
+if(document.hidden&&running)pauseGame();
+});
+makeFields();
+resizeCanvas();
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
