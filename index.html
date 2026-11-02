@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>KIDZ SMART RACE – Fantasy Edition</title>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --secondary: #FF9800;
+            --accent: #00BCD4;
+            --bg-dark: #0D1B2A;
+            --panel-bg: rgba(255, 255, 255, 0.96);
+            --text-main: #1E293B;
+            --shadow: 0 8px 24px rgba(0,0,0,0.3);
+            --radius-lg: 20px;
+            --radius-md: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        html, body {
+            width: 100vw;
+            height: 100dvh;
+            min-height: 100vh;
+            overflow: hidden;
+            background-color: #050B14;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-main);
+        }
+
+        /* Root App Container */
+        #game-container {
+            width: 100vw;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0F2027, #203A43, #2C5364);
+        }
+
+        /* Landscape Orientation Warning Screen */
+        #orientation-overlay {
+            position: fixed;
+            inset: 0;
+            background: #0D1B2A;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #FFF;
+            text-align: center;
+            padding: 20px;
+        }
+        #orientation-overlay svg {
+            width: 80px;
+            height: 80px;
+            animation: rotateDevice 2s infinite ease-in-out;
+            fill: #FF9800;
+            margin-bottom: 20px;
+        }
+        @keyframes rotateDevice {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(-90deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* Generic Overlay / Modal Screen */
+        .screen {
+            position: absolute;
+            inset: 0;
+            z-index: 100;
+            background: rgba(13, 27, 42, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: min(20px, 4vh);
+            color: white;
+            transition: opacity 0.3s ease;
+        }
+        .screen.hidden {
+            display: none !important;
+        }
+
+        /* Screen Typography & Components */
+        .title-text {
+            font-size: clamp(1.5rem, 5vh, 3rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #FFD700, #FF9800, #FF5722);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            margin-bottom: max(10px, 2vh);
+            text-align: center;
+        }
+        .card-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-lg);
+            padding: min(20px, 3vh);
+            width: min(90%, 750px);
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Button Styling */
+        .btn-fantasy {
+            background: linear-gradient(180deg, #4CAF50 0%, #2E7D32 100%);
+            border: none;
+            border-bottom: 4px solid #1B5E20;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            font-size: clamp(0.85rem, 2.5vh, 1.2rem);
+            padding: min(12px, 2vh) min(24px, 4vw);
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+            transition: transform 0.1s, filter 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+        .btn-fantasy:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+        .btn-secondary {
+            background: linear-gradient(180deg, #FF9800 0%, #E65100 100%);
+            border-bottom-color: #B71C1C;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+        }
+        .btn-blue {
+            background: linear-gradient(180deg, #0288D1 0%, #01579B 100%);
+            border-bottom-color: #002171;
+            box-shadow: 0 4px 15px rgba(2, 136, 209, 0.4);
+        }
+
+        /* Grid Selection Layouts */
+        .char-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .char-card {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid transparent;
+            border-radius: var(--radius-md);
+            padding: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .char-card.selected {
+            border-color: #FFD700;
+            background: rgba(255, 215, 0, 0.25);
+            transform: scale(1.05);
+        }
+        .char-card svg {
+            width: min(60px, 10vh);
+            height: min(60px, 10vh);
+        }
+
+        /* GAMEPLAY INTERFACE LAYOUT (STRICT 36% - 64% HEIGHT SPLIT) */
+        #game-layout {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* TOP RACE AREA: 36-38% Max Height */
+        #top-race-area {
+            height: 38%;
+            min-height: 0;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            background: #111;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        #race-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        #top-hud {
+            position: absolute;
+            top: 6px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 12;
+        }
+        .hud-chip {
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #FFF;
+            font-size: clamp(0.7rem, 2vh, 0.9rem);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            pointer-events: auto;
+        }
+
+        /* BOTTOM QUESTION AREA: 62-64% Height */
+        #bottom-quiz-area {
+            height: 62%;
+            min-height: 0;
+            width: 100%;
+            background: linear-gradient(180deg, #E2E8F0 0%, #CBD5E1 100%);
+            display: flex;
+            flex-direction: column;
+            padding: clamp(4px, 1.5vh, 10px) clamp(8px, 2vw, 16px);
+            box-sizing: border-box;
+            gap: min(6px, 1vh);
+            z-index: 5;
+        }
+
+        /* Player Status Ribbon */
+        #player-ribbon {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1E293B;
+            color: #FFF;
+            padding: 4px 12px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
+        .player-info-tag {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: clamp(0.75rem, 2.2vh, 1rem);
+            font-weight: 800;
+        }
+        .player-badge {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .score-pill {
+            background: #FF9800;
+            color: #000;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: clamp(0.7rem, 2vh, 0.9rem);
+        }
+
+        /* Question Box Container */
+        #question-box {
+            background: #FFF;
+            border: 2px solid #CBD5E1;
+            border-left: 6px solid #00BCD4;
+            border-radius: 12px;
+            padding: clamp(6px, 1.8vh, 12px);
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
+            overflow: hidden;
+        }
+        #question-text {
+            font-size: clamp(0.85rem, 2.8vh, 1.35rem);
+            font-weight: 700;
+            color: #0F172A;
+            line-height: 1.25;
+            word-break: break-word;
+        }
+
+        /* Answer Grid: 2 Columns x 2 Rows */
+        #answer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: clamp(4px, 1vh, 8px);
+            height: 48%;
+            min-height: 0;
+            flex-shrink: 0;
+        }
+        .btn-answer {
+            background: #FFFFFF;
+            border: 2px solid #94A3B8;
+            border-bottom: 4px solid #64748B;
+            border-radius: 10px;
+            font-size: clamp(0.8rem, 2.4vh, 1.1rem);
+            font-weight: 700;
+            color: #1E293B;
+            cursor: pointer;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: left;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.15s ease;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .btn-answer:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+        .btn-answer .opt-label {
+            background: #0288D1;
+            color: #FFF;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 900;
+            font-size: clamp(0.75rem, 2vh, 0.95rem);
+            flex-shrink: 0;
+        }
+        .btn-answer .opt-text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .btn-answer.correct-anim {
+            background: #DCFCE7 !important;
+            border-color: #22C55E !important;
+            border-bottom-color: #15803D !important;
+            color: #14532D !important;
+        }
+        .btn-answer.wrong-anim {
+            background: #FEE2E2 !important;
+            border-color: #EF4444 !important;
+            border-bottom-color: #B91C1C !important;
+            color: #7F1D1D !important;
+        }
+
+        /* Overlay Modal Screens Styling */
+        .setup-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            text-align: left;
+        }
+        .setup-group label {
+            font-size: 0.85rem;
+            color: #CBD5E1;
+            font-weight: bold;
+        }
+        .form-control {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #FFF;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .form-control option {
+            background: #0D1B2A;
+            color: #FFF;
+        }
+
+        /* Feedback Popup Indicator */
+        #feedback-toast {
+            position: absolute;
+            top: 42%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(0,0,0,0.85);
+            color: #FFF;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-size: clamp(1rem, 4vh, 1.6rem);
+            font-weight: 900;
+            z-index: 50;
+            pointer-events: none;
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 2px solid #FFD700;
+        }
+        #feedback-toast.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Certificate Modal */
+        #cert-modal {
+            background: #FFF;
+            color: #1E293B;
+            border: 8px solid #FFD700;
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="orientation-overlay">
+        <svg viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+        <h2>SILA PUSINGKAN TELEFON ANDA</h2>
+        <p>Permainan ini direka khas untuk skrin Landscape (Melintang).</p>
+    </div>
+
+    <div id="game-container">
+
+        <!-- SCREEN 1: MAIN MENU -->
+        <div id="screen-main-menu" class="screen">
+            <h1 class="title-text">KIDZ SMART RACE</h1>
+            <p style="color: #94A3B8; margin-bottom: 20px; font-weight: 600;">LARI • FIKIR • BELAJAR • MENANG!</p>
+            <div style="display: flex; flex-direction: column; gap: 12px; width: min(280px, 80%);">
+                <button class="btn-fantasy" onclick="GameApp.showScreen('screen-setup')">🎮 MULA MAIN</button>
+                <button class="btn-fantasy btn-blue" onclick="GameApp.toggleFullscreen()">📺 FULLSCREEN</button>
+                <button class="btn-fantasy btn-secondary" onclick="GameApp.showScreen('screen-achievements')">🏆 PENCAPAIAN</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: GAME SETUP -->
+        <div id="screen-setup" class="screen hidden">
+            <div class="card-panel">
+                <h2 style="text-align: center; color: #FFD700;">PENDAFTARAN PELUMBA</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="setup-group">
+                        <label>Bilangan Pemain:</label>
+                        <select id="select-player-count" class="form-control" onchange="GameApp.updatePlayerSetupUI()">
+                            <option value="3">3 Pemain</option>
+                            <option value="4">4 Pemain</option>
+                        </select>
+                    </div>
+                    <div class="setup-group">
+                        <label>Subjek Soalan:</label>
+                        <select id="select-subject" class="form-control">
+                            <option value="ALL">Semua Subjek (Campur)</option>
+                            <option value="ISLAM">Agama Islam</option>
+                            <option value="BM">Bahasa Melayu</option>
+                            <option value="MATH">Matematik</option>
+                            <option value="MINDA">Cabaran Minda</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Player Selection Container -->
+                <div id="players-input-list" style="display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Injected dynamically -->
+                </div>
+
+                <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                    <button class="btn-fantasy btn-secondary" onclick="GameApp.showScreen('screen-main-menu')">KEMBALI</button>
+                    <button class="btn-fantasy" onclick="GameApp.startRaceSession()">MULA PERLUMBAAN 🏁</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: ACHIEVEMENTS / STATS -->
+        <div id="screen-achievements" class="screen hidden">
+            <div class="card-panel">
+                <h2 style="text-align: center; color: #FFD700;">KOLEKSI PENCAPAIAN</h2>
+                <div id="achievements-list" style="display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Injected dynamically -->
+                </div>
+                <button class="btn-fantasy btn-secondary" style="margin-top: 10px;" onclick="GameApp.showScreen('screen-main-menu')">KEMBALI</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: WINNER / PODIUM SCREEN -->
+        <div id="screen-winner" class="screen hidden">
+            <div id="cert-modal">
+                <h1 style="color: #D97706; font-size: 1.8rem; margin-bottom: 4px;">🏆 TAHNIAH JUARA! 🏆</h1>
+                <h2 id="winner-name" style="color: #2563EB; font-size: 1.5rem; margin-bottom: 8px;">-</h2>
+                <p style="font-size: 0.9rem; margin-bottom: 12px;">Telah berjaya mencapai 50 Jawapan Betul dan memenangi Perlumbaan Kidz Smart Race!</p>
+                
+                <div id="podium-list" style="display: flex; justify-content: center; gap: 12px; margin-bottom: 12px;">
+                    <!-- Injected dynamically -->
+                </div>
+
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    <button class="btn-fantasy" onclick="GameApp.showScreen('screen-setup')">MAIN LAGI 🔄</button>
+                    <button class="btn-fantasy btn-secondary" onclick="GameApp.showScreen('screen-main-menu')">MENU UTAMA 🏠</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAMEPLAY INTERFACE SCREEN -->
+        <div id="game-layout">
+            
+            <!-- TOP RACE AREA (38%) -->
+            <div id="top-race-area">
+                <div id="top-hud">
+                    <div class="hud-chip" id="hud-subject">📚 Agama Islam</div>
+                    <div class="hud-chip" id="hud-bank-count">❓ Soalan: 500</div>
+                    <button class="hud-chip" style="cursor: pointer;" onclick="GameApp.pauseGame()">⏸️ PAUSE</button>
+                </div>
+                <canvas id="race-canvas"></canvas>
+            </div>
+
+            <!-- BOTTOM QUIZ AREA (62%) -->
+            <div id="bottom-quiz-area">
+                
+                <!-- Player Status Bar -->
+                <div id="player-ribbon">
+                    <div class="player-info-tag">
+                        <span id="player-badge-color" class="player-badge"></span>
+                        <span id="current-player-name">Pemain 1</span>
+                        <span style="font-size: 0.75rem; color: #94A3B8;">(Giliran Anda)</span>
+                    </div>
+                    <div class="score-pill">
+                        KEMAJUAN: <span id="current-player-score">0</span> / 50
+                    </div>
+                </div>
+
+                <!-- Question Card -->
+                <div id="question-box">
+                    <div id="question-text">Pemuatan soalan...</div>
+                </div>
+
+                <!-- 2x2 Answer Grid -->
+                <div id="answer-grid">
+                    <button class="btn-answer" onclick="GameApp.submitAnswer(0)">
+                        <span class="opt-label">A</span>
+                        <span class="opt-text" id="opt-0">-</span>
+                    </button>
+                    <button class="btn-answer" onclick="GameApp.submitAnswer(1)">
+                        <span class="opt-label">B</span>
+ 
